@@ -2,9 +2,19 @@
 (function( w ){
 
 	"use strict";
-
+    
+    var doneCB = [],
+        isDone = false;
+    
 	//exposed namespace
-	var respond = {};
+	var respond = {
+        onDone: function(cb) {
+            if (isDone) {
+                cb();
+            }
+            doneCB.push(cb);
+        }
+    };
 	w.respond = respond;
 
 	//define update even in native-mq-supporting browsers, to avoid errors
@@ -295,7 +305,14 @@
 					// we prevent "Stack overflow" error in IE7
 					w.setTimeout(function(){ makeRequests(); },0);
 				} );
-			}
+			} else {
+                //Do done callbacks
+                isDone = true;
+                var i;
+                for(i=0; i<doneCB.length; i++) {
+                    doneCB[i]();
+                }
+            }
 		},
 
 		//loop stylesheets, send text content to translate

@@ -1,5 +1,5 @@
 /*! Respond.js v1.4.2: min/max-width media query polyfill
- * Copyright 2014 Scott Jehl
+ * Copyright 2016 Scott Jehl
  * Licensed under MIT
  * http://j.mp/respondjs */
 
@@ -28,7 +28,15 @@
 
 (function(w) {
   "use strict";
-  var respond = {};
+  var doneCB = [], isDone = false;
+  var respond = {
+    onDone: function(cb) {
+      if (isDone) {
+        cb();
+      }
+      doneCB.push(cb);
+    }
+  };
   w.respond = respond;
   respond.update = function() {};
   var requestQueue = [], xmlHttp = function() {
@@ -66,7 +74,7 @@
   respond.regex = {
     media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
     keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
-    comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
+    comments: /\/\*[^*]*\*+([^\/][^*]*\*+)*\//gi,
     urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
     findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
     only: /(only\s+)?([a-zA-Z]+)\s?/,
@@ -200,6 +208,12 @@
           makeRequests();
         }, 0);
       });
+    } else {
+      isDone = true;
+      var i;
+      for (i = 0; i < doneCB.length; i++) {
+        doneCB[i]();
+      }
     }
   }, ripCSS = function() {
     for (var i = 0; i < links.length; i++) {
