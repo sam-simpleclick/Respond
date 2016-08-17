@@ -82,6 +82,7 @@ Sure, a couple:
 - respond.update() : rerun the parser (helpful if you added a stylesheet to the page and it needs to be translated)
 - respond.mediaQueriesSupported: set to true if the browser natively supports media queries.
 - respond.getEmValue() : returns the pixel value of one em
+- respond.onDone(fn) : accepts a function that will be called when respond has done its work.
 
 
 Alternatives to this script
